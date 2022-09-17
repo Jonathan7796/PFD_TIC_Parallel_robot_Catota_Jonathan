@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://ros.org/wiki/xacro">
+
+	<xacro:macro name="parallel_control">
+		
+	<!--CONFIGURACION DE CONTROL -->
+	<ros2_control name="GazeboSystem" type="system">
+  		<hardware>
+    		<plugin>gazebo_ros2_control/GazeboSystem</plugin>
+  		</hardware>
+		<joint name="act_1_joint_3">
+    		<command_interface name="effort">
+				<param name="min">-1000</param>
+      			<param name="max">1000</param>
+    		</command_interface>
+    	<state_interface name="position"/>
+    	</joint>	
+		<joint name="act_2_joint_3">
+    		<command_interface name="effort">
+				<param name="min">-1000</param>
+      			<param name="max">1000</param>
+    		</command_interface>
+    	<state_interface name="position"/>
+    	</joint>	
+		<joint name="act_3_joint_3">
+    		<command_interface name="effort">
+				<param name="min">-1000</param>
+      			<param name="max">1000</param>
+    		</command_interface>
+    	<state_interface name="position"/>
+    	</joint>	
+		<joint name="act_4_joint_2">
+    		<command_interface name="effort">
+				<param name="min">-1000</param>
+      			<param name="max">1000</param>
+    		</command_interface>
+    	<state_interface name="position"/>
+    	</joint>	
+	</ros2_control>
+
+	<!--PLUGIN DE CONTROL -->
+	<gazebo>
+		<plugin filename="libgazebo_ros2_control.so" name="gazebo_ros2_control">
+		<robot_param>robot_description</robot_param>
+        <robot_param_node>robot_state_publisher</robot_param_node>
+		<parameters>$(find parallel_robot)/config/parallel_control.yaml</parameters>
+		</plugin>
+	</gazebo>
+
+	</xacro:macro>
+
+</robot>
+
+
+

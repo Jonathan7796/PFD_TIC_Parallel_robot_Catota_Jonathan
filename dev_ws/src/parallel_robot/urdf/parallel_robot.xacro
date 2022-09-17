@@ -1,0 +1,235 @@
+<?xml version="1.0"?>
+<!--INICIO DE LA IMPLEMENTACION DEL ROBOT-->
+<robot name="parallel_robot" xmlns:xacro="http://ros.org/wiki/xacro">
+<!--INCLUSION DE LOS OTROS ARCHIVOS XACRO PARA MINIMIZAR EL CODIGO-->
+	<xacro:include filename="/home/jonathan/dev_ws/src/parallel_robot/urdf/parallel_control.xacro"/>
+	<xacro:include filename="/home/jonathan/dev_ws/src/parallel_robot/urdf/parallel_leg.xacro"/>   
+	<xacro:property name="M_PI" value="3.1415926535897931"/>
+	<!--VARIABLE GLOBAL-->
+	<xacro:property name="offset_a1_eje" value="${4.679004/1000}"/>
+	
+<!--ESLABON ESTATICO PARA ANCLAR EL ROBOT AL SUELO DEL ENTORNO VIRTUAL-->
+	<link name="world"/>
+
+	<joint name="joint_base" type="fixed">
+		<origin	xyz="0 0 0" rpy="0 0 0"/>
+		<parent link="world"/>
+		<child link="plataforma_fija"/>
+	</joint>
+
+<!--PLATAFORMA FIJA-->
+	<link name="plataforma_fija">
+		<inertial>
+			<origin xyz="0.03356 0.0002 0.00272" rpy="0 0 0"/>
+			 <mass value="4" />
+        
+        <inertia ixx="0.243510586851601" ixy="2.01662561942903E-05" ixz="-3.7336097607727E-11"
+        		 iyy="0.221243600487154" iyz="1.13446706472703E-11" izz="0.464732553209128" />
+        </inertial> 
+
+		<collision>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<geometry>
+				<mesh filename="file://$(find parallel_robot)/meshes/Plataforma_fija.dae"/>
+			</geometry>
+		</collision>
+
+		<visual>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<geometry>
+				<mesh filename="file://$(find parallel_robot)/meshes/Plataforma_fija.dae"/>
+			</geometry>
+		</visual>
+	</link>
+
+<!--UNION ENTRE PLATAFORMA FIJA Y CILINDRO CENTRAL-->
+	<joint name="act_4_joint_1" type="continuous"> 
+		<origin	xyz="1.5000e-01 1.4901e-08 0.04165 " rpy="0 ${1.4329e+01*pi/180} ${180*pi/180}"/>
+		<parent link="plataforma_fija"/>
+		<child link="cilindro4"/>
+		<axis xyz="0 1 0"/>
+		<limit velocity="1" effort="5.0"/>
+		<dynamics damping="1" friction="1" />	
+	</joint>
+
+<!--CILINDRO4-->
+	<link name="cilindro4">
+		<inertial>
+		<origin xyz="0 0 2.5173e-01" 
+				rpy="0 0 0 " />
+		<mass value="1.5" />
+		<inertia ixx="0.098498932" ixy="0.0" ixz="-0.003431442" iyy="0.094759468" iyz="0.0" izz="0.004491336"/>
+		</inertial>
+		<collision>
+				<origin xyz="0 0 0" rpy="0 0 0"/>
+				<geometry>
+					<mesh filename="file://$(find parallel_robot)/meshes/Cilindro4.dae"/>
+				</geometry>
+			</collision>
+
+			<visual>
+				<origin xyz="0 0 0" rpy="0 0 0"/>
+				<geometry>
+					<mesh filename="file://$(find parallel_robot)/meshes/Cilindro4.dae"/>
+				</geometry>
+			</visual>
+	</link>
+
+<!--UNION ENTRE CILINDRO 4 Y VASTAGO 4-->
+	<joint name="act_4_joint_2" type="prismatic">
+		<origin xyz= "0 0 ${0.1035+0.0172}" 
+		rpy="0 0 0"/>
+		<parent link="cilindro4" />
+		<child link="vastago4" />
+		<axis xyz="0 0 1" />
+		<limit 	lower="${4.679004/1000}" upper="${0.3}" velocity="1.1" effort="1000"/>
+		<dynamics damping="1.0"/>
+	</joint>
+
+<!--VASTAGO 4-->
+  	<link name="vastago4">
+		<inertial>
+			<origin	xyz="0 0 0.24851" rpy="0 0 0"/>
+			<mass value="1"/>
+			<inertia ixx="0.041870506" ixy="-1E-11" ixz="-1E-11" iyy="0.041877479" iyz="-1E-11" izz="5.17693E-05"/>
+		</inertial>
+		<collision>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<geometry>
+				<mesh filename="file://$(find parallel_robot)/meshes/Vastago4.dae"/>
+			</geometry>
+		</collision>
+
+		<visual>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<geometry>
+				<mesh filename="file://$(find parallel_robot)/meshes/Vastago4.dae"/>
+			</geometry>
+		</visual>
+	</link>
+
+<!--UNION ENTRE VASTAGO 4 Y ACOPLE UNIVERSAL-->
+	<joint name="act_4_joint_3" type="continuous">
+		<origin
+		 xyz="0 0 0.46735" 
+		 rpy= "0 ${-16 * pi / 180} 0"/>
+		<parent link="vastago4" />
+		<child link="Union4" />
+		<axis xyz="0 1 0" />
+		<limit velocity="0.5" effort="10.0"/>/>
+		<dynamics damping="1" friction="1" />
+    </joint>
+	
+<!--ACOPLE UNIVERSAL (UNION 4)-->
+	<link name="Union4">
+		<inertial>
+			<origin	xyz="0 0 0.0223" rpy="0 0 0"/>
+			<mass value="0.5"/>
+			<inertia ixx="4.16483E-04" ixy="0.0" ixz="0.0" iyy="4.00572E-04" iyz="0.0" izz="1.31775E-04"/>
+		</inertial>
+
+		<collision>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<geometry>
+				<mesh filename="file://$(find parallel_robot)/meshes/act_cent_acop_univ.dae"/>
+			</geometry>
+		</collision>
+
+		<visual>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<geometry>
+				<mesh filename="file://$(find parallel_robot)/meshes/act_cent_acop_univ.dae"/>
+			</geometry>
+		</visual>
+
+	</link> 
+
+<!--UNION ENTRE EL ACOPLE UNIVERSAL Y LA PLATAFORMA MOVIL-->
+    <joint name="act_4_joint_4" type="continuous">
+		<origin xyz="0.0 0 0.046" rpy="0 0 ${17*pi/180}"/>
+		<parent link="Union4"/>
+		<child link="plataforma_movil"/>
+		<axis xyz="0 0 1"/>
+		<limit  lower="${-pi/2}" upper="${pi/2}" velocity="0.5" effort="10.0"/>
+		<dynamics damping="1" friction="1" />	
+	</joint>
+
+<!--PLATAFORMA MOVIL-->
+	 <link name="plataforma_movil">
+		<inertial>
+		<origin xyz="0 0 0" rpy="0 0 0"/>
+		<mass value="1"/>
+		
+		<inertia ixx="0.03841638" ixy="0.000259422" ixz="0.000437233" 
+				 iyy="0.058447088" iyz="0.000386911" izz="0.096196358"/> 
+		</inertial>
+
+		<collision>
+		<origin xyz="0 0 0" rpy="0 0 0"/>
+		<geometry>
+			<mesh filename="file://$(find parallel_robot)/meshes/Plataforma_movil2.dae"/>
+		</geometry>
+		</collision>
+
+		<visual>
+		<origin xyz="0 0 0" rpy="0 0 0"/>
+		<geometry>
+			<mesh filename="file://$(find parallel_robot)/meshes/Plataforma_movil2.dae"/>
+		</geometry>
+		
+		</visual>
+
+	</link>
+	
+<!--IMPORTACION DE MACROS-->
+
+	<!--CONFIGURACION DE CONTROL-->
+	<xacro:parallel_control/>
+	<!--INCORPORACION DE PIERNAS EXTERNAS-->
+ 	<xacro:parallel_leg prefix="act_1" xyz="-4.0000e-01 0 4.0650e-02" rpy1="${-0.85e+01*pi/180} ${-1.1670e+01*pi/180} ${180*pi/180} " 
+										xyz2="0 0 0" rpy2="0 0 ${pi}" offset_eje="0.0172"/>
+	<xacro:parallel_leg prefix="act_2" xyz="0 4.0000e-01 4.0650e-02 " rpy1="${1.2679e+01*pi/180} ${1.2703e+01*pi/180} ${0*pi/180}" 
+										xyz2="0 0 0" rpy2="0 0 ${pi}" offset_eje="0.0172"/>
+	<xacro:parallel_leg prefix="act_3" xyz="2.8284e-01 -2.8284e-01 4.0650e-02" rpy1="${6.2418e-01*pi/180} ${-1.8135e+01*pi/180} ${0*pi/180}" 
+										xyz2="0 0 0" rpy2="0 0 ${pi}" offset_eje="0.0172"/>
+	
+<!--JOINTS CON COLISIONES EN GAZEBO PARA EVITAR QUE LOS VASTAGOS TRASPASEN LA PLATAFORMA MOVIL-->
+	<gazebo>
+		<joint name="act_1_joint_4" type="ball">
+			<pose>0.30 0 -0.0496 0 0 0</pose>
+			<parent>act_1_vastago</parent>
+			<child>plataforma_movil</child>
+			<damping>1.0</damping>
+			<friction>1.0</friction>
+			<axis> 1 1 1"</axis>
+		</joint>
+
+		<joint name="act_2_joint_4" type="ball">
+			<pose> -0.1928 -0.2298  -0.0496 0 0 0</pose>
+			<parent>act_2_vastago</parent>
+			<child>plataforma_movil</child>
+		</joint>
+			
+		<joint name="act_3_joint_4" type="ball">
+			<pose>0 0.3 -0.0496 0 0 0</pose>
+			<parent>act_3_vastago</parent>
+			<child>plataforma_movil</child>
+			</joint> 
+	</gazebo>  
+	
+<!--COLISIONES EN GAZEBO-->
+	<gazebo reference="plataforma_fija">
+		<selfCollide>true</selfCollide>
+	</gazebo> 
+	<gazebo reference="cilindro4">
+		<selfCollide>true</selfCollide>
+	</gazebo> 
+	<gazebo reference="plataforma_movil">
+		<selfCollide>true</selfCollide>
+		<material>Gazebo/Gray</material>
+	</gazebo>  
+	
+	
+	
+</robot>
+
